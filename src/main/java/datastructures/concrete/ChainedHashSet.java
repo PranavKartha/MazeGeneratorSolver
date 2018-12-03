@@ -1,40 +1,71 @@
 package datastructures.concrete;
 
+import datastructures.concrete.dictionaries.ChainedHashDictionary;
+import datastructures.interfaces.IDictionary;
 import datastructures.interfaces.ISet;
-import misc.exceptions.NotYetImplementedException;
-
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
- * See ISet for details about what each method is expected to do.
+ * See ISet for more details on what each method is supposed to do.
  */
 public class ChainedHashSet<T> implements ISet<T> {
+    // This should be the only field you need
+    private IDictionary<T, Boolean> map;
+    
+    private static final boolean ARBITRARY_BOOLEAN = true;
+
     public ChainedHashSet() {
-        throw new NotYetImplementedException();
+        // No need to change this method
+        this.map = new ChainedHashDictionary<>();
     }
 
     @Override
     public void add(T item) {
-        throw new NotYetImplementedException();
+        this.map.put(item, ARBITRARY_BOOLEAN);
     }
 
     @Override
     public void remove(T item) {
-        throw new NotYetImplementedException();
+        if (this.map.containsKey(item)) {
+            this.map.remove(item);
+        } else {
+            throw new NoSuchElementException();
+        }
     }
 
     @Override
     public boolean contains(T item) {
-        throw new NotYetImplementedException();
+        return this.map.containsKey(item);
     }
 
     @Override
     public int size() {
-        throw new NotYetImplementedException();
+        return this.map.size();
     }
 
     @Override
     public Iterator<T> iterator() {
-        throw new NotYetImplementedException();
+        return new SetIterator<>(this.map.iterator());
+    }
+
+    private static class SetIterator<T> implements Iterator<T> {
+        // This should be the only field you need
+        private Iterator<KVPair<T, Boolean>> iter;
+
+        public SetIterator(Iterator<KVPair<T, Boolean>> iter) {
+            // No need to change this method.
+            this.iter = iter;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return this.iter.hasNext();
+        }
+
+        @Override
+        public T next() {
+            return this.iter.next().getKey();
+        }
     }
 }
