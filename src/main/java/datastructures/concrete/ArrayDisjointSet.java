@@ -22,8 +22,17 @@ public class ArrayDisjointSet<T> implements IDisjointSet<T> {
     // successfully implement this class.
 
     public ArrayDisjointSet() {
-        this.pointers = new int[STARTING_SIZE];
+        this.pointers = this.makeNewArray(STARTING_SIZE);
         this.ranks = new ChainedHashDictionary<>();
+    }
+    
+    private int[] makeNewArray(int size) {
+        //  "empty" slots of array filled with value of array length
+        int[] bic = new int[size];
+        for (int i = 0; i < size; i++) {
+            bic[i] = size;
+        }
+        return bic;
     }
 
     @Override
@@ -35,9 +44,8 @@ public class ArrayDisjointSet<T> implements IDisjointSet<T> {
             this.resize(code + 1);
         }
         
-        if (this.pointers[code] != 0) { 
-            //  what if 0 is a parent
-            //  fix later...
+        int emptySlot = this.pointers.length;
+        if (this.pointers[code] != emptySlot) { 
             throw new IllegalArgumentException();
         }
         
@@ -49,9 +57,12 @@ public class ArrayDisjointSet<T> implements IDisjointSet<T> {
     }
     
     private void resize(int newSize) {
-        int[] newBoi = new int[newSize];
-        for (int i = 0; i < this.pointers.length; i++) {
-            newBoi[i] = this.pointers[i];
+        int[] newBoi = this.makeNewArray(newSize);
+        int oldSize = this.pointers.length;
+        for (int i = 0; i < oldSize; i++) {
+            if (this.pointers[i] != oldSize) {
+                newBoi[i] = this.pointers[i];
+            }
         }
         this.pointers = newBoi;
     }
