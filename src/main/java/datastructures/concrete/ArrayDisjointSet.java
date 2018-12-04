@@ -41,7 +41,7 @@ public class ArrayDisjointSet<T> implements IDisjointSet<T> {
             throw new IllegalArgumentException();
         }
         
-        //  item is new to Set
+        //  item is new to Set   
         // add -1 to code index
         // put code, 1 to ranks
         this.pointers[code] = -1;
