@@ -13,6 +13,7 @@ public class ArrayDisjointSet<T> implements IDisjointSet<T> {
     // directly within our private tests.
     private int[] pointers;
     private IDictionary<Integer, Integer> ranks;
+    //  note: might just be totally vestigial... FIX IF NEEDED
     
     private static final int STARTING_SIZE = 100;
 
@@ -21,9 +22,8 @@ public class ArrayDisjointSet<T> implements IDisjointSet<T> {
     // successfully implement this class.
 
     public ArrayDisjointSet() {
-
-        pointers = new int[STARTING_SIZE];
-        ranks = new ChainedHashDictionary<>();
+        this.pointers = new int[STARTING_SIZE];
+        this.ranks = new ChainedHashDictionary<>();
     }
 
     @Override
@@ -45,7 +45,7 @@ public class ArrayDisjointSet<T> implements IDisjointSet<T> {
         // add -1 to code index
         // put code, 1 to ranks
         this.pointers[code] = -1;
-        ranks.put(code, 1);
+        this.ranks.put(code, 1);
     }
     
     private void resize(int newSize) {
@@ -92,9 +92,25 @@ public class ArrayDisjointSet<T> implements IDisjointSet<T> {
             throw new IllegalArgumentException();
         }
         
+        //  keeping things positive b/c there's enough negativity in life
         int rank1 = this.pointers[parent1] * -1;
         int rank2 = this.pointers[parent2] * -1;
         
-        throw new NotYetImplementedException();
+        if (rank1 > rank2) {
+            this.pointers[parent2] = parent1;
+        } else if (rank1 < rank2) {
+            this.pointers[parent1] = parent2;
+        } else {
+            //  rank-tie case
+            //  resolve tie via hashCodes
+            //  largest hashCode wins
+            if (parent1 > parent2) {
+                this.pointers[parent1]--;
+                this.pointers[parent2] = parent1;
+            } else {
+                this.pointers[parent2]--;
+                this.pointers[parent1] = parent2;
+            }
+        }
     }
 }
