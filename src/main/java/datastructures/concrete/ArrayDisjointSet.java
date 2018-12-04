@@ -17,11 +17,12 @@ public class ArrayDisjointSet<T> implements IDisjointSet<T> {
 
     public ArrayDisjointSet() {
         // TODO: your code here
+        pointers = new int[100];
     }
 
     @Override
     public void makeSet(T item) {
-        throw new NotYetImplementedException();
+        
     }
 
     @Override
