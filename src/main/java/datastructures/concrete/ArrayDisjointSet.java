@@ -12,10 +12,10 @@ public class ArrayDisjointSet<T> implements IDisjointSet<T> {
     // Note: do NOT rename or delete this field. We will be inspecting it
     // directly within our private tests.
     private int[] pointers;
-    private IDictionary<Integer, Integer> ranks;
-    //  note: might just be totally vestigial... FIX IF NEEDED
+    private int counter;
+    private IDictionary<T, Integer> converter;
     
-    private static final int STARTING_SIZE = 100;
+    private static final int STARTING_SIZE = 10;
 
     // However, feel free to add more methods and private helper methods.
     // You will probably need to add one or two more fields in order to
@@ -23,7 +23,8 @@ public class ArrayDisjointSet<T> implements IDisjointSet<T> {
 
     public ArrayDisjointSet() {
         this.pointers = this.makeNewArray(STARTING_SIZE);
-        this.ranks = new ChainedHashDictionary<>();
+        this.counter = 0;
+        this.converter = new ChainedHashDictionary<>();
     }
     
     private int[] makeNewArray(int size) {
@@ -37,10 +38,10 @@ public class ArrayDisjointSet<T> implements IDisjointSet<T> {
 
     @Override
     public void makeSet(T item) {
-        //  assuming all hash codes are unique and positive
-        int code = item.hashCode();
+        //  codes based on count
+        int code = this.counter;
         if (code >= this.pointers.length) {
-            this.resize(code + 1);
+            this.resize(this.pointers.length * 2);
         }
         
         int emptySlot = this.pointers.length;
@@ -49,10 +50,10 @@ public class ArrayDisjointSet<T> implements IDisjointSet<T> {
         }
         
         //  item is new to Set
-        // add -1 to code index
-        // put code, 1 to ranks
+        //  add -1 to code index
         this.pointers[code] = -1;
-        this.ranks.put(code, 1);
+        this.converter.put(item, code);
+        this.counter++;
     }
     
     private void resize(int newSize) {
@@ -68,13 +69,11 @@ public class ArrayDisjointSet<T> implements IDisjointSet<T> {
 
     @Override
     public int findSet(T item) {
-        int code = item.hashCode();
-        
-        //  0 is default initial value.... for now
-        if (this.pointers.length >= code || this.pointers[code] == 0) {
+        if (!this.converter.containsKey(item)) {
             throw new IllegalArgumentException();
         }
-        //  ting should never have a parent with index 0...
+        
+        int code = this.converter.get(item);
         
         //  find parent of ting
         return this.findParent(code);
