@@ -1,8 +1,14 @@
 package misc.graphs;
 
+import datastructures.concrete.ArrayDisjointSet;
+import datastructures.concrete.ChainedHashSet;
 import datastructures.concrete.DoubleLinkedList;
+import datastructures.concrete.dictionaries.ChainedHashDictionary;
+import datastructures.interfaces.IDictionary;
+import datastructures.interfaces.IDisjointSet;
 import datastructures.interfaces.IList;
 import datastructures.interfaces.ISet;
+import misc.Searcher;
 import misc.exceptions.NoPathExistsException;
 import misc.exceptions.NotYetImplementedException;
 
@@ -51,8 +57,12 @@ public class Graph<V, E extends Edge<V> & Comparable<E>> {
     //
     // Working with generics is really not the focus of this class, so if you
     // get stuck, let us know we'll try and help you get unstuck as best as we can.
-
+    
+    private IDictionary<V,ChainedHashSet<E>> graph;
+    private IList<V> vertices;
+    private IList<E> edges;
     /**
+     * 
      * Constructs a new graph based on the given vertices and edges.
      *
      * @throws IllegalArgumentException  if any of the edges have a negative weight
@@ -60,7 +70,30 @@ public class Graph<V, E extends Edge<V> & Comparable<E>> {
      *                                   present in the 'vertices' list
      */
     public Graph(IList<V> vertices, IList<E> edges) {
-        // TODO: Your code here
+        graph = new ChainedHashDictionary<>();
+        for(E edge:edges) {
+            if(edge.getWeight() < 0) {
+                throw new IllegalArgumentException();
+            }
+            if(!vertices.contains(edge.getVertex1()) || !vertices.contains(edge.getVertex2())) {
+                throw new IllegalArgumentException();
+            }
+            if(!graph.containsKey(edge.getVertex1())) {
+                ISet <E> newSet = new ChainedHashSet<>();
+                newSet.add(edge);
+            }else{
+                graph.get(edge.getVertex1()).add(edge);
+            }
+            
+            if(!graph.containsKey(edge.getVertex2())) {
+                ISet <E> newSet = new ChainedHashSet<>();
+                newSet.add(edge);
+            }else{
+                graph.get(edge.getVertex2()).add(edge);
+            }           
+        }
+        this.vertices = vertices;
+        this.edges = edges;
     }
 
     /**
@@ -87,14 +120,14 @@ public class Graph<V, E extends Edge<V> & Comparable<E>> {
      * Returns the number of vertices contained within this graph.
      */
     public int numVertices() {
-        throw new NotYetImplementedException();
+        return this.vertices.size();
     }
 
     /**
      * Returns the number of edges contained within this graph.
      */
     public int numEdges() {
-        throw new NotYetImplementedException();
+        return this.edges.size();
     }
 
     /**
@@ -106,7 +139,45 @@ public class Graph<V, E extends Edge<V> & Comparable<E>> {
      * Precondition: the graph does not contain any unconnected components.
      */
     public ISet<E> findMinimumSpanningTree() {
-        throw new NotYetImplementedException();
+        IList<E> sortedEdges = this.sortedEdges();
+        ISet<E> minTree = new ChainedHashSet<>();
+        IDisjointSet<V> components = new ArrayDisjointSet<>();
+        for (V vertex: this.vertices) {
+            components.makeSet(vertex);
+        }
+        
+        for(E edge:sortedEdges) {
+            V v1 = edge.getVertex1();
+            V v2 = edge.getVertex2();
+            if(components.findSet(v1) != components.findSet(v2)) {
+                components.union(v1, v2);
+                minTree.add(edge);
+            }
+            
+            /*
+             * going through edges in increasing order
+             * first check:
+             *      do related vertices incest?
+             *      if so
+             *          nothing, joffrey was enough of a mistake
+             *      otherwise
+             *          add that shit, natural selection for the win
+             *  DONE LIKE THE RED WEDDING
+             *  next check:
+             *      is there only one parent?
+             *      if so
+             *          end me
+             *      otherwise
+             *          continue the loop
+             * 
+             */
+        }
+        
+        return minTree;
+        
+    }
+    private IList<E> sortedEdges() {
+        return Searcher.topKSort(edges.size(), edges);   
     }
 
     /**
