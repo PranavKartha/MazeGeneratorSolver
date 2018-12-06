@@ -27,22 +27,30 @@ public class KruskalMazeCarver implements MazeCarver {
         // call 'wall.resetDistanceToOriginal()' on the same wall before returning.
         
         ISet<Room> rooms = maze.getRooms();
-        ISet<Wall> walls = maze.getWalls();
+        ISet<Wall> allWalls = maze.getWalls();
         
-        // make copy of walls
-        ISet<Wall> wallCopy = new ChainedHashSet<>();
-        for (Wall wall: walls) {
-            wallCopy.add(new Wall(wall.getRoom1(), wall.getRoom2(), wall.getDividingLine()));
-        }
+//        // make copy of walls
+//        ISet<Wall> wallCopy = new ChainedHashSet<>();
+//        for (Wall wall: allWalls) {
+//            wallCopy.add(new Wall(wall.getRoom1(), wall.getRoom2(), wall.getDividingLine()));
+//        }
         
         // randomly assign wall weights
-        for (Wall wall: wallCopy) {
+//        for (Wall wall: wallCopy) {
+//            Random r = new Random(RANDOM_CAP);
+//            double rand = r.nextDouble();
+//            wall.setDistance(rand);
+//        }
+        
+        for (Wall wall: allWalls) {
             Random r = new Random(RANDOM_CAP);
             double rand = r.nextDouble();
             wall.setDistance(rand);
         }
         
-        Graph<Room, Wall> g =  new Graph<>(rooms, wallCopy);
+//        Graph<Room, Wall> g =  new Graph<>(rooms, wallCopy);
+        
+        Graph<Room, Wall> g = new Graph<>(rooms, allWalls);
         
         // make MST of wall weights
         ISet<Wall> mst = g.findMinimumSpanningTree();
@@ -51,7 +59,10 @@ public class KruskalMazeCarver implements MazeCarver {
         for (Wall wall: mst) {
             wall.resetDistanceToOriginal();
         }
-        for (Wall wall: wallCopy) {
+//        for (Wall wall: wallCopy) {
+//            wall.resetDistanceToOriginal();
+//        }
+        for (Wall wall: allWalls) {
             wall.resetDistanceToOriginal();
         }
         
@@ -59,6 +70,8 @@ public class KruskalMazeCarver implements MazeCarver {
         
         /*
          *  For some reason, we get the same maze on grid every time. ASK TA'S BABHUJi
+         *  
+         *  note: got this to work without making new copies of each wall
          */
     }
 }
