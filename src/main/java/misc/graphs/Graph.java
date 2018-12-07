@@ -80,6 +80,7 @@ public class Graph<V, E extends Edge<V> & Comparable<E>> {
             if(!vertices.contains(edge.getVertex1()) || !vertices.contains(edge.getVertex2())) {
                 throw new IllegalArgumentException();
             }
+            
             if(!graph.containsKey(edge.getVertex1())) {
                 ISet <E> newSet = new ChainedHashSet<>();
                 newSet.add(edge);
@@ -201,12 +202,14 @@ public class Graph<V, E extends Edge<V> & Comparable<E>> {
         VNode startNode = new VNode(start, 0, null);
         IPriorityQueue <VNode> heap = new ArrayHeap<> ();
         heap.insert(startNode);
+        System.out.println(start.toString());
         IDictionary<V, VNode> vNodes = new ChainedHashDictionary<>();        
         vNodes.put(start, startNode);
         VNode endNode = null;
         for(V vertex:this.vertices) {
             if(!vertex.equals(start)){
                 VNode inserted = new VNode(vertex, null);
+                System.out.println(vertex.toString());
                 vNodes.put(vertex, inserted);
                 heap.insert(inserted);
 //                if(vertex.equals(end)) {
@@ -222,6 +225,7 @@ public class Graph<V, E extends Edge<V> & Comparable<E>> {
         
         while(!heap.isEmpty()) {
             V vertex= heap.removeMin().vertex;
+           // System.out.println(vertex.toString());
             VNode vertexNode = vNodes.get(vertex);
             ISet<E> vEdges = graph.get(vertex);
             for(E edge:vEdges) {
