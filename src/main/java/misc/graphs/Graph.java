@@ -326,12 +326,10 @@ public class Graph<V, E extends Edge<V> & Comparable<E>> {
         public double distance;
         public V vertex;
         public V daddi;
-        public boolean processed;
         
         public VNode(V vertex, double distance, V papa) {
             this.vertex = vertex;
             this.distance = distance;
-            this.processed = false;
             this.daddi = papa;
         }
         
