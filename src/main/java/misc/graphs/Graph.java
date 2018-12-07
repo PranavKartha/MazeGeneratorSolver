@@ -203,22 +203,25 @@ public class Graph<V, E extends Edge<V> & Comparable<E>> {
         heap.insert(startNode);
         IDictionary<V, VNode> vNodes = new ChainedHashDictionary<>();        
         vNodes.put(start, startNode);
-        VNode endNode = null;
+       // VNode endNode = null;
         for(V vertex:this.vertices) {
-            if(!vertex.equals(start)){
+//            if(!vertex.equals(start)){
                 VNode inserted = new VNode(vertex, null);
                 vNodes.put(vertex, inserted);
-                heap.insert(inserted);
-                if(vertex.equals(end)) {
-                    endNode = inserted;
-                }
-            }
-        }
-        
+//                heap.insert(inserted);
+//                if(vertex.equals(end)) {
+//                    endNode = inserted;
+               }
+//            }
+//        }
+//        
         VNode currentNode = heap.removeMin();
         IList<V> shortestPath = new DoubleLinkedList<>();
-        while(!endNode.processed) {
-            ChainedHashSet<E> edges = graph.get(currentNode.vertex);
+        ISet<VNode> processed = new ChainedHashSet<>();
+        
+        //after a node is processed, place it into the processed set.
+        //when checking edges, if one edge has a vertex that is processed, ignore that edge
+        while(processed.size() != vertices.size()) {
             for(E edge:edges) {
                 V v1 = edge.getVertex1();
                 V v2 = edge.getVertex2();
@@ -230,7 +233,7 @@ public class Graph<V, E extends Edge<V> & Comparable<E>> {
                     //work off v1
                     toEdit = vNodes.get(v1);
                 }    
-          
+    
                 if(currentNode.distance + edge.getWeight() < toEdit.distance) {
                     toEdit.distance = currentNode.distance + edge.getWeight();
                     toEdit.daddi = currentNode.vertex;
@@ -238,34 +241,94 @@ public class Graph<V, E extends Edge<V> & Comparable<E>> {
                     vNodes.put(toHeap.vertex, toHeap);
                     heap.insert(toHeap);
                 }
-                
+          
             }
             currentNode.processed = true;
+            processed.add(currentNode);
             shortestPath.add(currentNode.vertex);
             currentNode = heap.removeMin(); 
         }
+  
+  
+            
+        
+        
+        //Dijkstra
+//        while(!endNode.processed) {
+//            ChainedHashSet<E> edges = graph.get(currentNode.vertex);
+//            for(E edge:edges) {
+//                V v1 = edge.getVertex1();
+//                V v2 = edge.getVertex2();
+//                VNode toEdit;
+//                if(v1.equals(currentNode.vertex)) {
+//                    //work off v2
+//                    toEdit = vNodes.get(v2);
+//                }else {
+//                    //work off v1
+//                    toEdit = vNodes.get(v1);
+//                }    
+//          
+//                if(currentNode.distance + edge.getWeight() < toEdit.distance) {
+//                    toEdit.distance = currentNode.distance + edge.getWeight();
+//                    toEdit.daddi = currentNode.vertex;
+//                    VNode toHeap = new VNode(toEdit.vertex, toEdit.distance, toEdit.daddi);
+//                    vNodes.put(toHeap.vertex, toHeap);
+//                    heap.insert(toHeap);
+//                }
+//                
+//            }
+//            currentNode.processed = true;
+//            shortestPath.add(currentNode.vertex);
+//            currentNode = heap.removeMin(); 
+//        }
+//        
+        
+        //end Dijkstra
+        
+        
+        ///try working backwards from end??
+        //look through processed set to avoid doing extra work?
+        
+        
+        
+        
         
         IList<E> shortestPathEdge = new DoubleLinkedList<>();
-        for(V vertex:shortestPath) {
-            if(!vertex.equals(end)) {
-                ISet<E> edges = graph.get(vertex);
-                for(E edge: edges) {
-                    if(vNodes.get(edge.getVertex1()).daddi.equals(vertex) || 
-                            vNodes.get(edge.getVertex2()).daddi.equals(vertex)) {
-                        shortestPathEdge.add(edge);
-                    }
-                            
-                }
-                
-            }else {
-                if (vNodes.get(end).distance == Double.POSITIVE_INFINITY) {
-                    throw new NoPathExistsException();
-                } else {
-                    return shortestPathEdge;
+        VNode current = vNodes.get(end);
+        while(current.daddi != null) {
+            V parent = current.daddi;
+            ///get parent
+            ISet<E> children = graph.get(parent);
+            for(E child:children) {
+                if(child.getVertex1().equals(current.vertex) || child.getVertex2().equals(current.vertex)) {
+                    shortestPathEdge.insert(0, child);
                 }
             }
+            //find edge from parent to child,
+            //add edge to IList
+            current = vNodes.get(parent);
         }
         
+//        for(V vertex:shortestPath) {
+//            if(!vertex.equals(end)) {
+//                ISet<E> edges = graph.get(vertex);
+//                for(E edge: edges) {
+//                    if(vNodes.get(edge.getVertex1()).daddi.equals(vertex) || 
+//                            vNodes.get(edge.getVertex2()).daddi.equals(vertex)) {
+//                        shortestPathEdge.add(edge);
+//                    }
+//                            
+//                }
+//                
+//            }else {
+//                if (vNodes.get(end).distance == Double.POSITIVE_INFINITY) {
+//                    throw new NoPathExistsException();
+//                } else {
+//                    return shortestPathEdge;
+//                }
+//            }
+//        }
+//        
         return shortestPathEdge;
         
         
