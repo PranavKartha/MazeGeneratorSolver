@@ -219,7 +219,7 @@ public class Graph<V, E extends Edge<V> & Comparable<E>> {
         IList<V> shortestPath = new DoubleLinkedList<>();
         ISet<VNode> processed = new ChainedHashSet<>();
         
-        //after a node is processed, place it into the processed set.
+        //after a node is processed, place it into the processed set.(or just use the field lmao)
         //when checking edges, if one edge has a vertex that is processed, ignore that edge
         while(processed.size() != vertices.size()) {
             for(E edge:edges) {
