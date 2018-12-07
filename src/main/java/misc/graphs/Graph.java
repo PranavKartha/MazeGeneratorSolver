@@ -239,6 +239,10 @@ public class Graph<V, E extends Edge<V> & Comparable<E>> {
             return this.processed;
         }
         
+        public boolean makeProcessed() {
+            this.processed = true;
+        }
+        
         public double getDistance() {
             return this.distance;
         }
