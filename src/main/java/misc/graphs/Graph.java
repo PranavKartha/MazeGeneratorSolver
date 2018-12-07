@@ -213,18 +213,30 @@ public class Graph<V, E extends Edge<V> & Comparable<E>> {
     private class VNode implements Comparable<VNode>{
         public double distance;
         public V vertex;
+        public V daddi;
+        public boolean processed;
         
-        public VNode(V vertex, double distance) {
+        public VNode(V vertex, double distance, V papa) {
             this.vertex = vertex;
             this.distance = distance;
+            this.processed = false;
+            this.daddi = papa;
         }
         
-        public VNode(V vertex) {
-            this(vertex, Double.POSITIVE_INFINITY);
+        public VNode(V vertex, V daddi) {
+            this(vertex, Double.POSITIVE_INFINITY, daddi);
         }
         
         public V getVertex() {
             return this.vertex;
+        }
+        
+        public V getDaddi() {
+            return this.daddi;
+        }
+        
+        public boolean processStatus() {
+            return this.processed;
         }
         
         public double getDistance() {
