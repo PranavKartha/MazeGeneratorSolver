@@ -202,8 +202,9 @@ public class Graph<V, E extends Edge<V> & Comparable<E>> {
          *  
          */
         
+        
         //  for ending:
-        //  if distance to end is Double.POSITIVE_INFINITY, throw NoPathExistsException()
+        //  if distance to end is Double.POSITIVE_INFINITY, throw NoPathExistsException() 
         throw new NotYetImplementedException();
     }
     
