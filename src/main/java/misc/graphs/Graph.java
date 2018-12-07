@@ -203,52 +203,79 @@ public class Graph<V, E extends Edge<V> & Comparable<E>> {
         heap.insert(startNode);
         IDictionary<V, VNode> vNodes = new ChainedHashDictionary<>();        
         vNodes.put(start, startNode);
-       // VNode endNode = null;
+        VNode endNode = null;
         for(V vertex:this.vertices) {
-//            if(!vertex.equals(start)){
+            if(!vertex.equals(start)){
                 VNode inserted = new VNode(vertex, null);
                 vNodes.put(vertex, inserted);
-//                heap.insert(inserted);
+                heap.insert(inserted);
 //                if(vertex.equals(end)) {
 //                    endNode = inserted;
                }
-//            }
+            }
 //        }
 //        
-        VNode currentNode = heap.removeMin();
+        VNode currentNode = vNodes.get(start);
         IList<V> shortestPath = new DoubleLinkedList<>();
         ISet<VNode> processed = new ChainedHashSet<>();
         
-        //after a node is processed, place it into the processed set.(or just use the field lmao)
-        //when checking edges, if one edge has a vertex that is processed, ignore that edge
-        while(processed.size() != vertices.size()) {
-            for(E edge:edges) {
-                V v1 = edge.getVertex1();
-                V v2 = edge.getVertex2();
-                VNode toEdit;
-                if(v1.equals(currentNode.vertex)) {
-                    //work off v2
-                    toEdit = vNodes.get(v2);
-                }else {
-                    //work off v1
-                    toEdit = vNodes.get(v1);
-                }    
-    
-                if(currentNode.distance + edge.getWeight() < toEdit.distance) {
-                    toEdit.distance = currentNode.distance + edge.getWeight();
-                    toEdit.daddi = currentNode.vertex;
-                    VNode toHeap = new VNode(toEdit.vertex, toEdit.distance, toEdit.daddi);
-                    vNodes.put(toHeap.vertex, toHeap);
-                    heap.insert(toHeap);
+        
+        while(!heap.isEmpty()) {
+            V vertex= heap.removeMin().vertex;
+            VNode vertexNode = vNodes.get(vertex);
+            ISet<E> vEdges = graph.get(vertex);
+            for(E edge:vEdges) {
+                V otherVertex = edge.getOtherVertex(vertex);
+                System.out.println(vertex.toString());
+                VNode otherVertexNode = vNodes.get(otherVertex);
+                double newDistance = edge.getWeight() + vertexNode.distance;
+                if (newDistance < otherVertexNode.distance) {
+                    otherVertexNode.distance = newDistance;
+                    otherVertexNode.daddi = vertex;
+                    vNodes.put(otherVertex, otherVertexNode);
+                    heap.insert(otherVertexNode);
                 }
-          
             }
-            currentNode.processed = true;
-            processed.add(currentNode);
-            shortestPath.add(currentNode.vertex);
-            currentNode = heap.removeMin(); 
         }
-  
+        //issue with heap??
+        //how do we use heap?
+        
+        
+//        //after a node is processed, place it into the processed set.(or just use the field lmao)
+//        //when checking edges, if one edge has a vertex that is processed, ignore that edge
+//        while(processed.size() != vertices.size()) {
+//            ISet<E> currentEdges = graph.get(currentNode.vertex);
+//            System.out.println(currentNode.vertex.toString());
+//            for(E edge:currentEdges) {
+//                V vertex = edge.getOtherVertex(currentNode.vertex);
+//                VNode otherVertex = vNodes.get(vertex);
+////                V v1 = edge.getVertex1();
+////                V v2 = edge.getVertex2();
+////                VNode toEdit;
+////                if(v1.equals(currentNode.vertex)) {
+////                    //work off v2
+////                    toEdit = vNodes.get(v2);
+////                }else {
+////                    //work off v1
+////                    toEdit = vNodes.get(v1);
+////                }    
+//                    if(!otherVertex.processed) {
+//                        if(currentNode.distance + edge.getWeight() < otherVertex.distance) {
+//                            otherVertex.distance = currentNode.distance + edge.getWeight();
+//                            otherVertex.daddi = currentNode.vertex;
+//                            VNode toHeap = new VNode(otherVertex.vertex, otherVertex.distance, otherVertex.daddi);
+//                            vNodes.put(toHeap.vertex, toHeap);
+//                            heap.insert(toHeap);
+//                        }
+//                    }    
+//          
+//            }
+//            currentNode.processed = true;
+//            processed.add(currentNode);
+//            shortestPath.add(currentNode.vertex);
+//            currentNode = heap.removeMin(); 
+//        }
+//  
   
             
         
