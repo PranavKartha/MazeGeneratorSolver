@@ -111,8 +111,8 @@ public class ArrayDisjointSet<T> implements IDisjointSet<T> {
             this.pointers[parent1] = parent2;
         } else {
             //  rank-tie case
-            //  resolve tie via hashCodes
-            //  largest hashCode wins
+            //  resolve tie via index value
+            //  largest index value wins
             if (parent1 > parent2) {
                 this.pointers[parent1]--;
                 this.pointers[parent2] = parent1;

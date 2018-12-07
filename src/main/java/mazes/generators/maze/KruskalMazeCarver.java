@@ -1,11 +1,9 @@
 package mazes.generators.maze;
 
-import datastructures.concrete.ChainedHashSet;
 import datastructures.interfaces.ISet;
 import mazes.entities.Maze;
 import mazes.entities.Room;
 import mazes.entities.Wall;
-import misc.exceptions.NotYetImplementedException;
 import misc.graphs.Graph;
 
 import java.util.Random;
@@ -17,7 +15,7 @@ import java.util.Random;
  */
 public class KruskalMazeCarver implements MazeCarver {
     
-    private static final int RANDOM_CAP = 100;
+    private static Random r = new Random(0);
     
     @Override
     public ISet<Wall> returnWallsToRemove(Maze maze) {
@@ -42,8 +40,8 @@ public class KruskalMazeCarver implements MazeCarver {
 //            wall.setDistance(rand);
 //        }
         
+//        Random  = new Random(seed.nextLong());
         for (Wall wall: allWalls) {
-            Random r = new Random(RANDOM_CAP);
             double rand = r.nextDouble();
             wall.setDistance(rand);
         }

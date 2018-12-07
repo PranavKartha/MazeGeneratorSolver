@@ -193,10 +193,57 @@ public class Graph<V, E extends Edge<V> & Comparable<E>> {
      * @throws NoPathExistsException  if there does not exist a path from the start to the end
      */
     public IList<E> findShortestPathBetween(V start, V end) {
+        if (start.equals(end)) {
+            return new DoubleLinkedList<E>();
+        }
+        
         /*
+         *  fields: list of all vertices, list of all edges, dictionary from vertex to set of edges.
          *  
          */
         
+        //  for ending:
+        //  if distance to end is Double.POSITIVE_INFINITY, throw NoPathExistsException()
         throw new NotYetImplementedException();
     }
+    
+    //  insert internal class for Heap structure here
+    //  stores vertex and related distance
+    //  all go in min-heap, top vertex is start
+    private class VNode implements Comparable<VNode>{
+        public double distance;
+        public V vertex;
+        
+        public VNode(V vertex, double distance) {
+            this.vertex = vertex;
+            this.distance = distance;
+        }
+        
+        public VNode(V vertex) {
+            this(vertex, Double.POSITIVE_INFINITY);
+        }
+        
+        public V getVertex() {
+            return this.vertex;
+        }
+        
+        public double getDistance() {
+            return this.distance;
+        }
+        
+        public void setDistance(double d) {
+            this.distance = d;
+        }
+        
+        public int compareTo(VNode other) {
+            if (this.distance > other.distance) {
+                return 1;
+            } else if (other.distance > this.distance) {
+                return -1;
+            } else {
+                return 0;
+            }
+        }
+    }
+    
 }
