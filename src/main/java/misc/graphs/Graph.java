@@ -234,7 +234,6 @@ public class Graph<V, E extends Edge<V> & Comparable<E>> {
                 VNode inserted = new VNode(vertex, null, null);
                 vNodes.put(vertex, inserted);
                 heap.insert(inserted);
-
                }
             }
     
@@ -277,20 +276,20 @@ public class Graph<V, E extends Edge<V> & Comparable<E>> {
         
         IList<E> shortestPathEdge = new DoubleLinkedList<>();
         VNode current = vNodes.get(end);
+        boolean hitsStart = false;
         while(current.daddi != null) {
+            if(current.edge.getVertex1().equals(start) || current.edge.getVertex2().equals(start)) {
+                hitsStart = true;
+            }
             System.out.println(current.edge);
             V parent = current.daddi;
             shortestPathEdge.insert(0,current.edge);
             current = vNodes.get(current.daddi);
             current = vNodes.get(parent);
         }
-        
-
-                
-        
-
-        
-  
+        if(!hitsStart) {
+           throw new NoPathExistsException(); 
+        }
         return shortestPathEdge;
         
         
