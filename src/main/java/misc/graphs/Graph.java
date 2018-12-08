@@ -1,12 +1,14 @@
 package misc.graphs;
 
 import datastructures.concrete.ArrayDisjointSet;
+import datastructures.concrete.ArrayHeap;
 import datastructures.concrete.ChainedHashSet;
 import datastructures.concrete.DoubleLinkedList;
 import datastructures.concrete.dictionaries.ChainedHashDictionary;
 import datastructures.interfaces.IDictionary;
 import datastructures.interfaces.IDisjointSet;
 import datastructures.interfaces.IList;
+import datastructures.interfaces.IPriorityQueue;
 import datastructures.interfaces.ISet;
 import misc.Searcher;
 import misc.exceptions.NoPathExistsException;
@@ -196,6 +198,76 @@ public class Graph<V, E extends Edge<V> & Comparable<E>> {
         if (start.equals(end)) {
             return new DoubleLinkedList<E>();
         }
+        VNode startNode = new VNode(start, 0, null);
+        IPriorityQueue <VNode> heap = new ArrayHeap<> ();
+        heap.insert(startNode);
+        IDictionary<V, VNode> vNodes = new ChainedHashDictionary<>();        
+        vNodes.put(start, startNode);
+        VNode endNode = null;
+        for(V vertex:this.vertices) {
+            if(!vertex.equals(start)){
+                VNode inserted = new VNode(vertex, null);
+                vNodes.put(vertex, inserted);
+                heap.insert(inserted);
+                if(vertex.equals(end)) {
+                    endNode = inserted;
+                }
+            }
+        }
+        
+        VNode currentNode = heap.removeMin();
+        IList<V> shortestPath = new DoubleLinkedList<>();
+        while(!endNode.processed) {
+            ChainedHashSet<E> edges = graph.get(currentNode.vertex);
+            for(E edge:edges) {
+                V v1 = edge.getVertex1();
+                V v2 = edge.getVertex2();
+                VNode toEdit;
+                if(v1.equals(currentNode.vertex)) {
+                    //work off v2
+                    toEdit = vNodes.get(v2);
+                }else {
+                    //work off v1
+                    toEdit = vNodes.get(v1);
+                }    
+          
+                if(currentNode.distance + edge.getWeight() < toEdit.distance) {
+                    toEdit.distance = currentNode.distance + edge.getWeight();
+                    toEdit.daddi = currentNode.vertex;
+                    VNode toHeap = new VNode(toEdit.vertex, toEdit.distance, toEdit.daddi);
+                    vNodes.put(toHeap.vertex, toHeap);
+                    heap.insert(toHeap);
+                }
+                
+            }
+            currentNode.processed = true;
+            shortestPath.add(currentNode.vertex);
+            currentNode = heap.removeMin(); 
+        }
+        
+        IList<E> shortestPathEdge = new DoubleLinkedList<>();
+        for(V vertex:shortestPath) {
+            if(!vertex.equals(end)) {
+                ISet<E> edges = graph.get(vertex);
+                for(E edge: edges) {
+                    if(vNodes.get(edge.getVertex1()).daddi.equals(vertex) || 
+                            vNodes.get(edge.getVertex2()).daddi.equals(vertex)) {
+                        shortestPathEdge.add(edge);
+                    }
+                            
+                }
+                
+            }else {
+                if (vNodes.get(end).distance == Double.POSITIVE_INFINITY) {
+                    throw new NoPathExistsException();
+                } else {
+                    return shortestPathEdge;
+                }
+            }
+        }
+        
+        return shortestPathEdge;
+        
         
         /*
          *  fields: list of all vertices, list of all edges, dictionary from vertex to set of edges.
@@ -204,13 +276,34 @@ public class Graph<V, E extends Edge<V> & Comparable<E>> {
         
         
         //  for ending:
-        //  if distance to end is Double.POSITIVE_INFINITY, throw NoPathExistsException() 
-        throw new NotYetImplementedException();
+
+    
+//    private void dijkstraHelper(VNode current, VNode end, IPriorityQueue<VNode> heap,
+//            IDictionary<V, VNode> vNodes, double distanceTravelled) {
+//        ChainedHashSet<E> edges = graph.get(current.vertex);
+//        for(E edge:edges) {
+//            VNode toEdit;
+//            V v1 = edge.getVertex1();
+//            V v2 = edge.getVertex2();
+//            if(v1.equals(current.vertex)) {
+//                //work off v2
+//                toEdit = vNodes.get(v2);
+//            }else {
+//                //work off v1
+//                toEdit = vNodes.get(v1);
+//            }
+//            
+//            if(toEdit.distance < distanceTravelled)
+//            toEdit.distance = edge.
+//        }
     }
+        
+        
+    
     
     //  insert internal class for Heap structure here
     //  stores vertex and related distance
-    //  all go in min-heap, top vertex is start
+    //  all go in min-heap, top vertex is start 
     private class VNode implements Comparable<VNode>{
         public double distance;
         public V vertex;
@@ -228,30 +321,6 @@ public class Graph<V, E extends Edge<V> & Comparable<E>> {
             this(vertex, Double.POSITIVE_INFINITY, daddi);
         }
         
-        public V getVertex() {
-            return this.vertex;
-        }
-        
-        public V getDaddi() {
-            return this.daddi;
-        }
-        
-        public boolean processStatus() {
-            return this.processed;
-        }
-        
-        public void makeProcessed() {
-            this.processed = true;
-        }
-        
-        public double getDistance() {
-            return this.distance;
-        }
-        
-        public void setDistance(double d) {
-            this.distance = d;
-        }
-        
         public int compareTo(VNode other) {
             if (this.distance > other.distance) {
                 return 1;
@@ -262,5 +331,6 @@ public class Graph<V, E extends Edge<V> & Comparable<E>> {
             }
         }
     }
-    
 }
+    
+
