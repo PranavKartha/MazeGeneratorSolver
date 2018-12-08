@@ -1,12 +1,10 @@
 package misc.graphs;
 
-import java.util.Iterator;
 
 import datastructures.concrete.ArrayDisjointSet;
 import datastructures.concrete.ArrayHeap;
 import datastructures.concrete.ChainedHashSet;
 import datastructures.concrete.DoubleLinkedList;
-import datastructures.concrete.KVPair;
 import datastructures.concrete.dictionaries.ChainedHashDictionary;
 import datastructures.interfaces.IDictionary;
 import datastructures.interfaces.IDisjointSet;
@@ -15,7 +13,7 @@ import datastructures.interfaces.IPriorityQueue;
 import datastructures.interfaces.ISet;
 import misc.Searcher;
 import misc.exceptions.NoPathExistsException;
-import misc.exceptions.NotYetImplementedException;
+
 
 /**
  * Represents an undirected, weighted graph, possibly containing self-loops, parallel edges,
@@ -63,7 +61,7 @@ public class Graph<V, E extends Edge<V> & Comparable<E>> {
     // Working with generics is really not the focus of this class, so if you
     // get stuck, let us know we'll try and help you get unstuck as best as we can.
     
-    private IDictionary<V,ISet<E>> graph;
+    private IDictionary<V, ISet<E>> graph;
     private IList<V> vertices;
     private IList<E> edges;
     /**
@@ -76,31 +74,31 @@ public class Graph<V, E extends Edge<V> & Comparable<E>> {
      */
     public Graph(IList<V> vertices, IList<E> edges) {
         graph = new ChainedHashDictionary<>();
-        for(E edge:edges) {
-            if(edge.getWeight() < 0) {
+        for (E edge:edges) {
+            if (edge.getWeight() < 0) {
                 throw new IllegalArgumentException();
             }
-            if(!vertices.contains(edge.getVertex1()) || !vertices.contains(edge.getVertex2())) {
+            if (!vertices.contains(edge.getVertex1()) || !vertices.contains(edge.getVertex2())) {
                 throw new IllegalArgumentException();
             }
             
             
-            if(!graph.containsKey(edge.getVertex1())) {
-                ISet <E> newSet = new ChainedHashSet<>();
+            if (!graph.containsKey(edge.getVertex1())) {
+                ISet<E> newSet = new ChainedHashSet<>();
                 newSet.add(edge);
                 graph.put(edge.getVertex1(), newSet);
-            }else{
+            }else {
                 ISet<E> newSet = graph.get(edge.getVertex1());
                 newSet.add(edge);
                 graph.put(edge.getVertex1(), newSet);               
             }
             
-            if(!graph.containsKey(edge.getVertex2())) {
-                ISet <E> newSet = new ChainedHashSet<>();
+            if (!graph.containsKey(edge.getVertex2())) {
+                ISet<E> newSet = new ChainedHashSet<>();
                 newSet.add(edge);
                 graph.put(edge.getVertex2(), newSet);
 
-            }else{
+            }else {
                 ISet<E> newSet = graph.get(edge.getVertex2());
                 newSet.add(edge);
                 graph.put(edge.getVertex2(), newSet);  
@@ -142,18 +140,7 @@ public class Graph<V, E extends Edge<V> & Comparable<E>> {
      */
     public int numEdges() {
         return this.edges.size();
-//        ISet<E> countedEdges = new ChainedHashSet<>();
-//        //Iterator<KVPair<V, ISet<E>>> i = graph.iterator();
-//        
-//        for (KVPair<V, ISet<E>> p: graph) {
-//            for (E edge: p.getValue()) {
-//                countedEdges.add(edge);
-//            }
-//        }
-//        return countedEdges.size();
-        
 
-        //return this.graph.size();
     }
 
     /**
@@ -172,10 +159,10 @@ public class Graph<V, E extends Edge<V> & Comparable<E>> {
             components.makeSet(vertex);
         }
         
-        for(E edge:sortedEdges) {
+        for (E edge:sortedEdges) {
             V v1 = edge.getVertex1();
             V v2 = edge.getVertex2();
-            if(components.findSet(v1) != components.findSet(v2)) {
+            if (components.findSet(v1) != components.findSet(v2)) {
                 components.union(v1, v2);
                 minTree.add(edge);
             }
@@ -225,12 +212,12 @@ public class Graph<V, E extends Edge<V> & Comparable<E>> {
             return new DoubleLinkedList<E>();
         }
         VNode startNode = new VNode(start, 0, null, null);
-        IPriorityQueue <VNode> heap = new ArrayHeap<> ();
+        IPriorityQueue<VNode> heap = new ArrayHeap<>();
         heap.insert(startNode);
         IDictionary<V, VNode> vNodes = new ChainedHashDictionary<>();        
         vNodes.put(start, startNode);
-        for(V vertex:this.vertices) {
-            if(!vertex.equals(start)){
+        for (V vertex:this.vertices) {
+            if (!vertex.equals(start)){
                 VNode inserted = new VNode(vertex, null, null);
                 vNodes.put(vertex, inserted);
                 heap.insert(inserted);
@@ -240,12 +227,11 @@ public class Graph<V, E extends Edge<V> & Comparable<E>> {
 
         
         
-        while(!heap.isEmpty()) {
+        while (!heap.isEmpty()) {
             V vertex= heap.removeMin().vertex;
-           // System.out.println(vertex.toString());
             VNode vertexNode = vNodes.get(vertex);
             ISet<E> vEdges = graph.get(vertex);
-            for(E edge:vEdges) {
+            for (E edge:vEdges) {
                 V otherVertex = edge.getOtherVertex(vertex);
                 VNode otherVertexNode = vNodes.get(otherVertex);
                 double newDistance = edge.getWeight() + vertexNode.distance;
@@ -277,17 +263,18 @@ public class Graph<V, E extends Edge<V> & Comparable<E>> {
         IList<E> shortestPathEdge = new DoubleLinkedList<>();
         VNode current = vNodes.get(end);
         boolean hitsStart = false;
-        while(current.daddi != null) {
-            if(current.edge.getVertex1().equals(start) || current.edge.getVertex2().equals(start)) {
+        while (current.daddi != null) {
+            if (current.edge.getVertex1().equals(start) ||
+                    current.edge.getVertex2().equals(start)) {
                 hitsStart = true;
             }
             System.out.println(current.edge);
             V parent = current.daddi;
-            shortestPathEdge.insert(0,current.edge);
+            shortestPathEdge.insert(0, current.edge);
             current = vNodes.get(current.daddi);
             current = vNodes.get(parent);
         }
-        if(!hitsStart) {
+        if (!hitsStart) {
            throw new NoPathExistsException(); 
         }
         return shortestPathEdge;
@@ -310,7 +297,7 @@ public class Graph<V, E extends Edge<V> & Comparable<E>> {
     //  insert internal class for Heap structure here
     //  stores vertex and related distance
     //  all go in min-heap, top vertex is start 
-    private class VNode implements Comparable<VNode>{
+    private class VNode implements Comparable<VNode> {
         public double distance;
         public V vertex;
         public V daddi;
