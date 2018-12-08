@@ -207,6 +207,7 @@ public class Graph<V, E extends Edge<V> & Comparable<E>> {
      */
     
     //why is graph empty??
+    @SuppressWarnings("unchecked")
     public IList<E> findShortestPathBetween(V start, V end) {
         if (start.equals(end)) {
             return new DoubleLinkedList<E>();
@@ -228,7 +229,7 @@ public class Graph<V, E extends Edge<V> & Comparable<E>> {
         
         
         while (!heap.isEmpty()) {
-            V vertex= heap.removeMin().vertex;
+            V vertex= (V) heap.removeMin().vertex;
             VNode vertexNode = vNodes.get(vertex);
             ISet<E> vEdges = graph.get(vertex);
             for (E edge:vEdges) {
@@ -264,14 +265,14 @@ public class Graph<V, E extends Edge<V> & Comparable<E>> {
         VNode current = vNodes.get(end);
         boolean hitsStart = false;
         while (current.daddi != null) {
-            if (current.edge.getVertex1().equals(start) ||
-                    current.edge.getVertex2().equals(start)) {
+            E currentEdge = (E) current.edge;
+            if (currentEdge.getVertex1().equals(start) ||
+                    currentEdge.getVertex2().equals(start)) {
                 hitsStart = true;
             }
-            System.out.println(current.edge);
-            V parent = current.daddi;
-            shortestPathEdge.insert(0, current.edge);
-            current = vNodes.get(current.daddi);
+            V parent = (V) current.daddi;
+            shortestPathEdge.insert(0, (E) current.edge);
+            current = vNodes.get((V) current.daddi);
             current = vNodes.get(parent);
         }
         if (!hitsStart) {
@@ -297,19 +298,19 @@ public class Graph<V, E extends Edge<V> & Comparable<E>> {
     //  insert internal class for Heap structure here
     //  stores vertex and related distance
     //  all go in min-heap, top vertex is start 
-    private class VNode implements Comparable<VNode> {
+    private static class VNode implements Comparable<VNode> {
         public double distance;
-        public V vertex;
-        public V daddi;
-        public E edge;
-        public VNode(V vertex, double distance, V papa, E edge) {
+        public Object vertex;
+        public Object daddi;
+        public Object edge;
+        public VNode(Object vertex, double distance, Object papa, Object edge) {
             this.vertex = vertex;
             this.distance = distance;
             this.daddi = papa;
             this.edge = edge;
         }
         
-        public VNode(V vertex, V daddi, E edge) {
+        public VNode(Object vertex, Object daddi, Object edge) {
             this(vertex, Double.POSITIVE_INFINITY, daddi, edge);
         }
 
