@@ -3,7 +3,6 @@ package datastructures.concrete;
 import datastructures.concrete.dictionaries.ChainedHashDictionary;
 import datastructures.interfaces.IDictionary;
 import datastructures.interfaces.IDisjointSet;
-import misc.exceptions.NotYetImplementedException;
 
 /**
  * See IDisjointSet for more details.
